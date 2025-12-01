@@ -27,6 +27,8 @@ function App() {
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
+
+        Bangladesh Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quibusdam dolorem ipsa rem obcaecati dolores minus.
       </p>
     </>
   )
