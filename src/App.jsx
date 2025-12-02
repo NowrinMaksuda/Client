@@ -25,11 +25,12 @@ function App() {
           Edit <code>src/App.jsx</code> and save to test HMR
         </p>
       </div>
-      <p className="read-the-docs">
+      <p className="read-the-docs text-primary">
         Click on the Vite and React logos to learn more
 
         Bangladesh Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quibusdam dolorem ipsa rem obcaecati dolores minus.
       </p>
+      <button className='btn btn-primary'>btn</button>
     </>
   )
 }
