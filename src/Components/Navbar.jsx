@@ -1,21 +1,32 @@
 import React from 'react';
 import { NavLink } from 'react-router';
+import useAuth from '../hooks/useAuth';
 
 const Navbar = () => {
+  const{user,logOut}=useAuth()
   const links = (
     <>
       <li>
-          <NavLink>Home</NavLink>
-        </li>
+        <NavLink to="/">Home</NavLink>
+      </li>
       <li>
-          <NavLink>About</NavLink>
+        <NavLink to="/about">About</NavLink>
+      </li>
+      {user && (
+        <li>
+          <NavLink to="/user-dashboard">Dashboard</NavLink>
         </li>
-      
+      )}
     </>
   );
 
+    const handleLogut = () => {
+      logOut().then(() => {
+        alert('logout');
+      });
+    };
   return (
-    <div className="navbar bg-base-100 shadow-sm">
+    <div className="navbar bg-secondary shadow-sm">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -39,19 +50,24 @@ const Navbar = () => {
             tabIndex="-1"
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
-         {links}
+            {links}
           </ul>
         </div>
         <a className="btn btn-ghost text-xl">daisyUI</a>
       </div>
       <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1">
-      
-       {links}
-        </ul>
+        <ul className="menu menu-horizontal px-1">{links}</ul>
       </div>
       <div className="navbar-end">
-        <a className="btn">Button</a>
+        {user ? (
+          <NavLink onClick={handleLogut} className="btn btn-primary text-white">
+            Logout
+          </NavLink>
+        ) : (
+          <NavLink to="/login" className="btn btn-primary text-white">
+            Login
+          </NavLink>
+        )}
       </div>
     </div>
   );
