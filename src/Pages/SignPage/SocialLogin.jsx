@@ -1,31 +1,54 @@
 import React from 'react';
 import useAuth from '../../hooks/useAuth';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
+import { useNavigate } from 'react-router';
+import { toast } from 'react-toastify';
 
 const SocialLogin = () => {
-  const { handleGoogle } = useAuth()
-  const axiosSecure=useAxiosSecure()
-  const google = ()=> {
+  const { handleGoogle } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
+
+  const googleLogin = () => {
     handleGoogle()
-    .then(res=>{
-      console.log(res.user);
-            const userInfo = {
-              email: res.user.email,
-              displayName: res.user.name,
-              photoURL: res.user.photoURL,
-            };
-      axiosSecure.post('users', userInfo)
-        .then(res => { 
-          console.log('data hasbeen stored',res.data)
-        })
-    })
+      .then(res => {
+        const user = res.user;
+        console.log(user);
+
+        // 1️⃣ Navigate & toast
+        navigate('/');
+        toast.success('Login successfully');
+
+        // 2️⃣ Prepare user info
+        const userInfo = {
+          name: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          role: 'user', 
+        };
+
+        // 3️⃣ Save in MongoDB
+        axiosSecure
+          .post('/users', userInfo)
+          .then(res => {
+            if (res.data.success) {
+              console.log('User data saved to DB:', res.data);
+            }
+          })
+          .catch(err => console.log(err));
+      })
       .catch(err => {
-      console.log(err);
-    })
-  }
+        console.log(err);
+        toast.error('Login failed');
+      });
+  };
+
   return (
     <div>
-      <button className="btn bg-white text-black border-[#e5e5e5] w-full" onClick={google}>
+      <button
+        className="btn bg-white text-black border-[#e5e5e5] w-full flex items-center justify-center gap-2"
+        onClick={googleLogin}
+      >
         <svg
           aria-label="Google logo"
           width="16"

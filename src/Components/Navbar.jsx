@@ -12,10 +12,18 @@ const Navbar = () => {
       <li>
         <NavLink to="/about">About</NavLink>
       </li>
+      <li>
+        <NavLink to="/doctors">Doctors</NavLink>
+      </li>
       {user && (
-        <li>
-          <NavLink to="/user-dashboard">Dashboard</NavLink>
-        </li>
+        <>
+          <li>
+            <NavLink to="/dashboard">Dashboard</NavLink>
+          </li>
+          <li>
+            <NavLink to="/be-a-doctor">Apply Doctor</NavLink>
+          </li>
+        </>
       )}
     </>
   );
@@ -53,7 +61,7 @@ const Navbar = () => {
             {links}
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl">daisyUI</a>
+        <a className="btn btn-ghost text-xl">TeleMed</a>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">{links}</ul>

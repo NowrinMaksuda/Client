@@ -1,42 +1,32 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import useAuth from './useAuth';
 
-
-
-const axiosSecure = axios.create({
-  baseURL: 'http://localhost:3000',
-});
+const axiosSecure = axios.create({ baseURL: 'http://localhost:3000' });
 
 const useAxiosSecure = () => {
-  const { user} = useAuth();
-
+  const { user, dbUser } = useAuth();
+ 
 
   useEffect(() => {
-    // intercept request
+    // Request interceptor
     const reqInterceptor = axiosSecure.interceptors.request.use(config => {
-      config.headers.Authorization = `Bearer ${user?.accessToken}`;
+      if (user?.accessToken)
+        config.headers.Authorization = `Bearer ${user.accessToken}`;
+      if (dbUser?.role) config.headers.role = dbUser.role;
       return config;
     });
 
-    // interceptor response
     const resInterceptor = axiosSecure.interceptors.response.use(
-      response => {
-        return response;
-      },
-      error => {
-        console.log(error);
-    
-
-        return Promise.reject(error);
-      }
+      res => res,
+      err => Promise.reject(err)
     );
 
     return () => {
       axiosSecure.interceptors.request.eject(reqInterceptor);
       axiosSecure.interceptors.response.eject(resInterceptor);
     };
-  }, [user]);
+  }, [user, dbUser]);
 
   return axiosSecure;
 };

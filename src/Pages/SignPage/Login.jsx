@@ -1,17 +1,21 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import SocialLogin from './SocialLogin';
+import { toast } from 'react-toastify';
+
 
 const Login = () => {
   const { register, handleSubmit } = useForm();
   const { logIn } = useAuth();
-
+const navigate=useNavigate()
   const handleLogin = data => {
     logIn(data.email, data.password)
       .then(res => {
         console.log(res.user);
+        navigate('/')
+        toast.success('login successfully')
       })
       .catch(err => {
         console.log(err);
@@ -69,7 +73,7 @@ const Login = () => {
           <p className="text-center text-gray-600 mt-2">
             Don’t have an account?
             <Link
-              to="/Login"
+              to="/Register"
               className="text-primary font-semibold underline ml-1"
             >
               Register

@@ -1,48 +1,61 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import useAuth from '../../hooks/useAuth';
 import SocialLogin from './SocialLogin';
 import axios from 'axios';
-import useAxiosSecure from '../../hooks/useAxiosSecure';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const { register, handleSubmit } = useForm();
   const { registerUser, updateUserProfile } = useAuth();
-  // const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
 
   const handleRegister = data => {
+    // 1️⃣ Firebase authentication
     registerUser(data.email, data.password)
       .then(result => {
         const profileImg = data.photo[0];
         const formData = new FormData();
         formData.append('image', profileImg);
 
+        // 2️⃣ Upload profile image to imgbb
         const image_api_url =
           'https://api.imgbb.com/1/upload?key=3b5f429460eb98f68a788baad91b9b83';
 
-        axios.post(image_api_url, formData).then(res => {
-          const photoURL = res.data.data.url;
+        axios
+          .post(image_api_url, formData)
+          .then(res => {
+            const photoURL = res.data.data.url;
 
-          const userInfo = {
-            email: data.email,
-            displayName: data.name,
-            photoURL: photoURL,
-          };
+            // 3️⃣ Prepare user info to save in MongoDB
+            const userInfo = {
+              name: data.name,
+              email: data.email,
+              photoURL: photoURL,
+              role: 'user', // normal user
+            };
 
-          // axiosSecure.post('/users', userInfo).then(res => {
-          //   if (res.data.insertedId) {
-          //     console.log('User added to DB');
-          //   }
-          // });
+            // 4️⃣ Save user in MongoDB
+            axios
+              .post('http://localhost:3000/users', userInfo)
+              .then(res => {
+                if (res.data.success) {
+                  console.log('User added to DB');
+                  toast.success('Registration successful!');
+                  navigate('/');
+                }
+              })
+              .catch(err => console.log(err));
 
-          const userProfile = {
-            displayName: data.name,
-            photoURL: photoURL,
-          };
-
-          updateUserProfile(userProfile);
-        });
+            // 5️⃣ Update Firebase user profile
+            const userProfile = {
+              displayName: data.name,
+              photoURL: photoURL,
+            };
+            updateUserProfile(userProfile);
+          })
+          .catch(err => console.log(err));
       })
       .catch(err => console.log(err));
   };
@@ -63,7 +76,7 @@ const Register = () => {
             type="text"
             placeholder="Full Name"
             className="input input-bordered w-full text-gray-800"
-            {...register('name')}
+            {...register('name', { required: true })}
           />
 
           {/* Email */}
@@ -71,14 +84,14 @@ const Register = () => {
             type="email"
             placeholder="Email Address"
             className="input input-bordered w-full text-gray-800"
-            {...register('email')}
+            {...register('email', { required: true })}
           />
 
           {/* Image */}
           <input
             type="file"
             className="file-input file-input-bordered w-full"
-            {...register('photo')}
+            {...register('photo', { required: true })}
           />
 
           {/* Password */}
@@ -86,7 +99,7 @@ const Register = () => {
             type="password"
             placeholder="Password"
             className="input input-bordered w-full text-gray-800"
-            {...register('password')}
+            {...register('password', { required: true })}
           />
 
           {/* Register Button */}
